@@ -8,6 +8,10 @@
 #   Name of the user.
 #   Required
 #
+# [*engineid*]
+#   Engine ID to tie user to
+#   Default: undef
+#
 # [*authpass*]
 #   Authentication password for the user.
 #   Required
@@ -53,6 +57,7 @@
 # Copyright (C) 2012 Mike Arnold, unless otherwise noted.
 #
 define snmp::snmpv3_user (
+  $engineid = undef,
   $authpass,
   $authtype = 'SHA',
   $privpass = undef,
@@ -60,12 +65,21 @@ define snmp::snmpv3_user (
   $daemon   = 'snmpd'
 ) {
   # Validate our regular expressions
+  if ($engineid != undef) {
+    validate_re($engineid, '0x[a-zA-Z0-9]+', '$engineid must be a hexadecimal string')
+    $engineid_string = "-e $engineid"
+  } else {
+    $engineid_string = ''
+  }
+
   $hash_options = [ '^SHA$', '^MD5$' ]
   validate_re($authtype, $hash_options, '$authtype must be either SHA or MD5.')
   $enc_options = [ '^AES$', '^DES$' ]
   validate_re($privtype, $enc_options, '$privtype must be either AES or DES.')
   $daemon_options = [ '^snmpd$', '^snmptrapd$' ]
   validate_re($daemon, $daemon_options, '$daemon must be either snmpd or snmptrapd.')
+
+
 
   include ::snmp
 
@@ -78,10 +92,11 @@ define snmp::snmpv3_user (
   }
 
   if $privpass {
-    $cmd = "createUser ${title} ${authtype} \\\"${authpass}\\\" ${privtype} \\\"${privpass}\\\""
+    $cmd = "createUser ${engineid_string} ${title} ${authtype} \\\"${authpass}\\\" ${privtype} \\\"${privpass}\\\""
   } else {
-    $cmd = "createUser ${title} ${authtype} \\\"${authpass}\\\""
+    $cmd = "createUser ${engineid_string} ${title} ${authtype} \\\"${authpass}\\\""
   }
+
   exec { "create-snmpv3-user-${title}":
     path    => '/bin:/sbin:/usr/bin:/usr/sbin',
     # TODO: Add "rwuser ${title}" (or rouser) to /etc/snmp/${daemon}.conf
