@@ -173,6 +173,10 @@
 #   Commandline options passed to snmpd via init script.
 #   Default: auto-set, platform specific
 #
+# [*manage_snmpd_service]
+#   Whether to manage service resource for snmpd: (true|false)
+#   Default: true
+#
 # [*service_ensure*]
 #   Ensure if service is running or stopped.
 #   Default: running
@@ -299,6 +303,7 @@ class snmp (
   $autoupgrade             = $snmp::params::safe_autoupgrade,
   $package_name            = $snmp::params::package_name,
   $snmpd_options           = $snmp::params::snmpd_options,
+  $manage_snmpd_service    = $snmp::params::manage_snmpd_service,
   $service_config_perms    = $snmp::params::service_config_perms,
   $service_ensure          = $snmp::params::service_ensure,
   $service_name            = $snmp::params::service_name,
@@ -533,12 +538,14 @@ class snmp (
     }
   }
 
-  service { 'snmpd':
-    ensure     => $service_ensure_real,
-    name       => $service_name,
-    enable     => $service_enable_real,
-    hasstatus  => $service_hasstatus,
-    hasrestart => $service_hasrestart,
-    require    => [ Package['snmpd'], File['var-net-snmp'], ],
+  if ($real_manage_snmpd_service) {
+    service { 'snmpd':
+      ensure     => $service_ensure_real,
+      name       => $service_name,
+      enable     => $service_enable_real,
+      hasstatus  => $service_hasstatus,
+      hasrestart => $service_hasrestart,
+      require    => [ Package['snmpd'], File['var-net-snmp'], ],
+    }
   }
 }

@@ -237,6 +237,15 @@ class snmp::params {
     $safe_manage_snmpd_conf = $manage_snmpd_conf
   }
 
+  $manage_snmpd_service = $::snmp_manage_snmpd_service ? {
+    undef => true,
+    default => $::snmp_manage_snmpd_service,
+  }
+  if is_string($manage_snmpd_service) {
+    $safe_manage_snmpd_service = str2bool($manage_snmpd_service)
+  } else {
+    $safe_manage_snmpd_service = $manage_snmpd_service
+  }
 
   $service_enable = $::snmp_service_enable ? {
     undef   => true,
