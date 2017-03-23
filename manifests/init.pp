@@ -145,6 +145,10 @@
 #   Whether to manage the package resouce. (true|false)
 #   Default: true
 #
+# [*manage_snmpd_conf]
+#   Whether to manage the snmpd.conf file resource. (true|false)
+#   Default: true
+#
 # [*snmp_config*]
 #   Safety valve.  Array of lines to add to the client's global snmp.conf file.
 #   See http://www.net-snmp.org/docs/man/snmp.conf.html for all options.
@@ -289,6 +293,7 @@ class snmp (
   $install_client          = $snmp::params::install_client,
   $manage_client           = $snmp::params::safe_manage_client,
   $manage_package          = $snmp::params::safe_manage_package,
+  $manage_snmpd_conf       = $snmp::params::safe_manage_snmpd_conf,
   $snmp_config             = $snmp::params::snmp_config,
   $ensure                  = $snmp::params::ensure,
   $autoupgrade             = $snmp::params::safe_autoupgrade,
