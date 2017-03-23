@@ -442,15 +442,18 @@ class snmp (
     }
   }
 
-  file { 'snmpd.conf':
-    ensure  => $file_ensure,
-    mode    => $service_config_perms,
-    owner   => 'root',
-    group   => $snmp::params::service_config_dir_group,
-    path    => $snmp::params::service_config,
-    content => template('snmp/snmpd.conf.erb'),
-    require => Package['snmpd'],
-    notify  => Service['snmpd'],
+
+  if ($real_manage_snmpd_conf) {
+    file { 'snmpd.conf':
+      ensure  => $file_ensure,
+      mode    => $service_config_perms,
+      owner   => 'root',
+      group   => $snmp::params::service_config_dir_group,
+      path    => $snmp::params::service_config,
+      content => template('snmp/snmpd.conf.erb'),
+      require => Package['snmpd'],
+      notify  => Service['snmpd'],
+    }
   }
 
   if $::osfamily != 'FreeBSD' {
