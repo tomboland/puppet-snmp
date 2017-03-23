@@ -411,7 +411,7 @@ class snmp (
     }
   }
 
-  if ($manage_package) {
+  if ($real_manage_package) {
     package { 'snmpd':
       ensure => $package_ensure,
       name   => $package_name,
